@@ -15,13 +15,13 @@ public class AccountBlockedException extends IOException {
     private String provideTheWord(long time) {
         switch ((int) time) {
             case 1 -> {
-                return "секунду.\n";
+                return "секунду.";
             }
             case 2, 3, 4 -> {
-                return "секунды.\n";
+                return "секунды.";
             }
             default -> {
-                return "секунд.\n";
+                return "секунд.";
             }
         }
     }

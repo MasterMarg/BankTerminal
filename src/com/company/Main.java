@@ -50,6 +50,7 @@ public class Main {
             if (terminalBase.getClients().isEmpty()) {
                 System.out.println(ANSI_BOLD + "Зарегистрируйтесь!" + ANSI_RESET);
                 createClient(terminalBase, scanner);
+                System.out.println();
             }
             if (!isThereInputError) {
                 for (String string : mainMenu) System.out.println(ANSI_BOLD + string + ANSI_RESET);
@@ -125,7 +126,7 @@ public class Main {
                     menuErrorCounter = menuErrorCounter + 1;
                     if (menuErrorCounter == 3) System.out.println(ANSI_BOLD_RED + "Ошибка ввода!" + ANSI_RESET);
                     else {
-                        System.out.println(ANSI_BOLD_RED + "Ошибка! Повторите ввод:" + ANSI_RESET);
+                        System.out.print(ANSI_BOLD_RED + "Ошибка! Повторите ввод:" + ANSI_RESET);
                         isThereInputError = true;
                     }
                 }
@@ -161,7 +162,7 @@ public class Main {
         Object[] clientData = terminalBase.getClientData(cardNumber);
         Client theClient = (Client) clientData[0];
         Card theCard = (Card) clientData[1];
-        System.out.println(ANSI_BOLD + "Введите ПИН-код:" + ANSI_RESET);
+        System.out.println(ANSI_BOLD + "Введите PIN-код:" + ANSI_RESET);
         Scanner scanner = new Scanner(System.in);
         String pinCode = scanner.nextLine();
         if (!pinCode.equals(theCard.getPinCode())) throw new WrongPinCodeException();
@@ -187,11 +188,11 @@ public class Main {
                         System.out.println(ANSI_BOLD_RED + exception.getMessage() + ANSI_RESET);
                     }
                 }
-                case 2 -> System.out.println(ANSI_BOLD + "Ваш баланс " + ANSI_BOLD_WHITE +
-                        terminalBase.getBalance(theCard) + ANSI_RESET);
+                case 2 -> System.out.println(ANSI_BOLD + "Ваш баланс: " + ANSI_BOLD_WHITE +
+                        terminalBase.getBalance(theCard) + " рублей." + ANSI_RESET);
                 case 3 -> {
-                    System.out.println(ANSI_BOLD + "Введите ПИН-код" + ANSI_RESET);
-                    String pinCode2 = scanner.nextLine();
+                    System.out.println(ANSI_BOLD + "Введите PIN-код" + ANSI_RESET);
+                    String pinCode2 = scanner.next();
                     if (!pinCode2.equals(theCard.getPinCode())) throw new WrongPinCodeException();
                     System.out.println(ANSI_BOLD + "Введите сумму (сумма должна быть кратна 100)" + ANSI_RESET);
                     int money = scanner.nextInt();
@@ -216,13 +217,28 @@ public class Main {
                     System.out.println(ANSI_BOLD + (counter + 1) + ". Отмена" + ANSI_RESET);
                     int choice = scanner.nextInt();
                     if (choice > 0 && choice <= theClient.getCards().size()) {
-                        if (terminalBase.deleteCard(theClient, theCard, choice - 1)) isDoneWorking = true;
+                        try {
+                            System.out.println(ANSI_BOLD + "Для подтверждения введите PIN-код удаляемой карты:"
+                                    + ANSI_RESET);
+                            String pinCode2 = scanner.next();
+                            if (!theClient.getCards().get(choice - 1).getPinCode().equals(pinCode2))
+                                throw new WrongPinCodeException();
+                            if (terminalBase.deleteCard(theClient, theCard, choice - 1)) isDoneWorking = true;
+                        } catch (WrongPinCodeException exception) {
+                            if (theClient.getCards().get(choice - 1).getCardNumber().equals(theCard.getCardNumber()))
+                                throw new WrongPinCodeException();
+                            System.out.println(ANSI_BOLD_RED + exception.getMessage() + ANSI_RESET);
+                        }
                     } else if (choice != theClient.getCards().size() + 1)
                         System.out.println(ANSI_BOLD_RED + "Ошибка ввода!" + ANSI_RESET);
                 }
                 case 6 -> {
-                    isDoneWorking = true;
-                    terminalBase.deleteClient(theClient);
+                    System.out.println("Для подтверждения удаления введите имя пользователя:");
+                    String name = scanner.next();
+                    if (name.equals(theClient.getName())) {
+                        isDoneWorking = true;
+                        terminalBase.deleteClient(theClient);
+                    } else System.out.println(ANSI_BOLD_RED + "Имя пользователя введено неверно!" + ANSI_RESET);
                 }
                 case 7 -> isDoneWorking = true;
                 default -> {

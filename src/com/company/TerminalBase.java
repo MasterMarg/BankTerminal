@@ -40,7 +40,7 @@ public class TerminalBase implements Terminal, Serializable {
         this.clients.add(client);
         String[] log = new String[5];
         log[0] = "\n******************************";
-        log[4] = "******************************\n";
+        log[4] = "******************************";
         log[1] = "Имя пользователя: \u001b[30;1m" + client.getName();
         log[2] = "Номер карты: \u001b[30;1m" + card.getCardNumber();
         log[3] = "PIN-код: \u001b[30;1m" + card.getPinCode();
